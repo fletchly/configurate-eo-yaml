@@ -9,7 +9,7 @@ import com.amihaiemil.eoyaml.YamlMappingBuilder;
 import com.amihaiemil.eoyaml.YamlNode;
 import com.amihaiemil.eoyaml.YamlSequence;
 import com.amihaiemil.eoyaml.YamlSequenceBuilder;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.CommentedConfigurationNodeIntermediary;
 import org.spongepowered.configurate.ConfigurateException;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  *
  * @author hpfxd
  */
-public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<CommentedConfigurationNode> {
+public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<@NotNull CommentedConfigurationNode> {
     /**
      * All values are internally represented as a {@link String}.
      */
@@ -50,7 +50,7 @@ public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<Comme
         return new Builder();
     }
     
-    public static final class Builder extends AbstractConfigurationLoader.Builder<Builder, EOYamlConfigurationLoader> {
+    public static final class Builder extends AbstractConfigurationLoader.Builder<@NotNull Builder, @NotNull EOYamlConfigurationLoader> {
         private boolean guessIndentation = false;
         
         /**
@@ -114,7 +114,7 @@ public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<Comme
         readNode(mapping, node);
     }
     
-    private void readNode(@NonNull YamlNode yamlNode, @NonNull CommentedConfigurationNode node) throws ParsingException {
+    private void readNode(@NotNull YamlNode yamlNode, @NotNull CommentedConfigurationNode node) throws ParsingException {
         Comment comment = yamlNode.comment();
         
         // check that comment exists
@@ -174,7 +174,7 @@ public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<Comme
     }
     
     @Override
-    protected void saveInternal(@NonNull ConfigurationNode node, @NonNull Writer writer) throws ConfigurateException {
+    protected void saveInternal(@NotNull ConfigurationNode node, @NotNull Writer writer) throws ConfigurateException {
         try {
             if (!node.isMap() && (node.virtual() || node.raw() == null)) {
                 writer.write(SYSTEM_LINE_SEPARATOR);
@@ -192,22 +192,10 @@ public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<Comme
         }
     }
     
-    private YamlNode writeNode(@NonNull ConfigurationNode node) {
+    private YamlNode writeNode(@NotNull ConfigurationNode node) {
         // the node's comment, or an empty string if not set
-        String comment = "";
-        
-        if (node instanceof CommentedConfigurationNodeIntermediary<?>) {
-            // holy shit this class name is annoying me
-            CommentedConfigurationNodeIntermediary<?> commentedNode = (CommentedConfigurationNodeIntermediary<?>) node;
-            
-            String c = commentedNode.comment();
-            if (c != null && !c.isEmpty()) {
-                // interesting; eo-yaml seems to only support multi-line
-                // comments if they're separated using the system line separator
-                comment = c.replaceAll("\\r?\\n", AbstractConfigurationLoader.SYSTEM_LINE_SEPARATOR);
-            }
-        }
-        
+        String comment = getComment(node);
+
         if (node.isMap()) {
             YamlMappingBuilder builder = Yaml.createYamlMappingBuilder();
     
@@ -237,7 +225,23 @@ public class EOYamlConfigurationLoader extends AbstractConfigurationLoader<Comme
                     .buildPlainScalar(comment, "");
         }
     }
-    
+
+    private static @NotNull String getComment(@NotNull ConfigurationNode node) {
+        String comment = "";
+
+        if (node instanceof CommentedConfigurationNodeIntermediary<?> commentedNode) {
+            // holy shit this class name is annoying me
+
+            String c = commentedNode.comment();
+            if (c != null && !c.isEmpty()) {
+                // interesting; eo-yaml seems to only support multi-line
+                // comments if they're separated using the system line separator
+                comment = c.replaceAll("\\r?\\n", AbstractConfigurationLoader.SYSTEM_LINE_SEPARATOR);
+            }
+        }
+        return comment;
+    }
+
     @Override
     public CommentedConfigurationNode createNode(ConfigurationOptions options) {
         return CommentedConfigurationNode.root(options.nativeTypes(NATIVE_TYPES));

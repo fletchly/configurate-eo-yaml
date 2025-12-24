@@ -1,6 +1,7 @@
 package io.fletchly.configurate.eoyaml;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
 import org.spongepowered.configurate.loader.CommentHandler;
 import org.spongepowered.configurate.util.Strings;
@@ -14,7 +15,7 @@ public class YamlCommentHandler implements CommentHandler {
     private static final String COMMENT_PREFIX = "#";
     
     @Override
-    public @Nullable String extractHeader(final BufferedReader reader) throws IOException {
+    public @Nullable String extractHeader(final @NotNull BufferedReader reader) throws IOException {
         if (!beginsWithPrefix(reader)) {
             return null;
         }
@@ -23,17 +24,17 @@ public class YamlCommentHandler implements CommentHandler {
         final StringBuilder build = new StringBuilder();
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             if (firstLine) {
-                if (line.length() > 0 && line.charAt(0) == ' ') {
+                if (!line.isEmpty() && line.charAt(0) == ' ') {
                     line = line.substring(1);
                 }
                 build.append(line);
                 firstLine = false;
             } else if (line.trim().startsWith(COMMENT_PREFIX)) {
                 line = line.substring(line.indexOf(COMMENT_PREFIX) + 1);
-                if (line.length() > 0 && line.charAt(0) == ' ') {
+                if (!line.isEmpty() && line.charAt(0) == ' ') {
                     line = line.substring(1);
                 }
-                if (build.length() > 0) {
+                if (!build.isEmpty()) {
                     build.append(AbstractConfigurationLoader.CONFIGURATE_LINE_SEPARATOR);
                 }
                 build.append(line);
@@ -44,14 +45,14 @@ public class YamlCommentHandler implements CommentHandler {
             }
         }
         // We've reached the end of the document?
-        return build.length() > 0 ? build.toString() : null;
+        return !build.isEmpty() ? build.toString() : null;
     }
     
     @Override
-    public Stream<String> toComment(final Stream<String> lines) {
+    public @NotNull Stream<String> toComment(final Stream<String> lines) {
         return Stream.concat(lines
                 .map(s -> {
-                    if (s.length() > 0 && s.charAt(0) == ' ') {
+                    if (!s.isEmpty() && s.charAt(0) == ' ') {
                         return COMMENT_PREFIX + s;
                     } else {
                         return COMMENT_PREFIX + " " + s;

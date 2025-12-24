@@ -1,8 +1,6 @@
 plugins {
     java
     `java-library`
-    `maven-publish`
-    signing
 }
 
 group = "io.fletchly.configurate"
