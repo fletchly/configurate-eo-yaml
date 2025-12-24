@@ -1,4 +1,4 @@
-package com.hpfxd.configurate.eoyaml;
+package io.fletchly.configurate.eoyaml;
 
 import com.amihaiemil.eoyaml.Comment;
 import com.amihaiemil.eoyaml.Node;

@@ -1,4 +1,4 @@
-package com.hpfxd.configurate.eoyaml;
+package io.fletchly.configurate.eoyaml;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader;

@@ -1,6 +1,6 @@
-package com.hpfxd.configurate.eoyaml.test;
+package io.fletchly.configurate.eoyaml.test;
 
-import com.hpfxd.configurate.eoyaml.EOYamlConfigurationLoader;
+import io.fletchly.configurate.eoyaml.EOYamlConfigurationLoader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Test;
